@@ -1,2 +1,2 @@
 # WWOTD
-Reddit bot.  posting Welsh Word Of The Day bot in r/learnwelsh
+Reddit bot. Posting a Welsh Word Of The Day daily to r/learnwelsh
