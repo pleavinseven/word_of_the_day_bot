@@ -1,5 +1,6 @@
 # WWOTD
-Reddit bot. Posting a Welsh Word Of The Day daily to r/learnwelsh
+Reddit bot. Posting a Welsh Word Of The Day, with English translation, a short description and word class/lexical category, daily to r/learnwelsh.
+
 # TODO:
-- Add github secrets
-- Import and add time function
+- Add github secrets.
+- Import and add time function.
