@@ -1,4 +1,5 @@
 import praw
+import os
 import random
 from googletrans import Translator
 from PyDictionary import PyDictionary
@@ -9,7 +10,13 @@ dictionary = PyDictionary()
 word_list = open('word_list.text', 'r').read().split(' ')
 
 def test_post():
-    reddit = 'redditpraw_credentials' # TODO: github secret
+    # os.getenv variables are 'config vars' (enviornmental variables) in Heroku.
+    reddit = praw.Reddit(client_id=os.getenv('client_id'),
+                         client_secret=os.getenv('client_secret'),
+                         user_agent='testrobot12345',
+                         username='testrobot12345',
+                         password=os.getenv('Reddit_password'))
+
 
     eng_word = random.choice(word_list)
     translate_word = translator.translate(eng_word, dest='cy', src='auto') # all info on translated word, too much info.
