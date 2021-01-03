@@ -10,7 +10,7 @@ dictionary = PyDictionary()
 word_list = open('word_list.text', 'r').read().split(' ')
 
 def test_post():
-    # os.getenv variables are 'config vars' (enviornmental variables) in Heroku.
+    # os.getenv variables are 'config vars' (environmental variables) in Heroku.
     reddit = praw.Reddit(client_id=os.getenv('client_id'),
                          client_secret=os.getenv('client_secret'),
                          user_agent='testrobot12345',
