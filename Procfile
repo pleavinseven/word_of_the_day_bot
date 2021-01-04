@@ -1,2 +1,2 @@
-worker: redditbot.py
-web: redditbot.py
+worker:redditbot.py
+web:redditbot.py
