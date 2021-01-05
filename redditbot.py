@@ -1,5 +1,7 @@
 import praw
 import os
+import schedule
+import time
 import random
 from googletrans import Translator
 from PyDictionary import PyDictionary
@@ -9,6 +11,7 @@ dictionary = PyDictionary()
 
 word_list = open('word_list.text', 'r').read().split(' ')
 
+
 def test_post():
     # os.getenv variables are 'config vars' (environmental variables) in Heroku.
     reddit = praw.Reddit(client_id=os.getenv('client_id'),
@@ -17,9 +20,9 @@ def test_post():
                          username='testrobot12345',
                          password=os.getenv('Reddit_password'))
 
-
     eng_word = random.choice(word_list)
-    translate_word = translator.translate(eng_word, dest='cy', src='auto') # all info on translated word, too much info.
+    translate_word = translator.translate(eng_word, dest='cy',
+                                          src='auto')  # all info on translated word, too much info.
     welsh_word = translate_word.text  # translated word only.
     if welsh_word == eng_word:
         test_post()
@@ -32,4 +35,9 @@ def test_post():
     selftext = '{0}  \n\n{1}'.format(eng_word, Nav)
     reddit.subreddit('testingground4bots').submit(title, selftext)
 
-test_post()
+
+schedule.every().day.at("10:30").do(test_post)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
