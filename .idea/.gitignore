@@ -1,0 +1,5 @@
+# Default ignored files
+*.xml
+site-packages/
+redditbot.iml
+
