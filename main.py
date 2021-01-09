@@ -27,13 +27,11 @@ def WWOTDpost():
             Nav = nav
     title = 'WWOTD: {}'.format(welsh_word)
     selftext = '{0}  \n\n{1}'.format(eng_word, Nav)
-    reddit.subreddit('testingground4bots').submit(title, selftext)
-
-    schedule.every().day.at("10:30").do(WWOTDpost)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    reddit.subreddit('learnwelsh').submit(title, selftext)
 
 
-WWOTDpost()
+schedule.every().day.at("10:30").do(WWOTDpost)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
