@@ -30,7 +30,8 @@ def WWOTDpost():
     reddit.subreddit('learnwelsh').submit(title, selftext)
 
 
-schedule.every().day.at("14:30").do(WWOTDpost)
+schedule.every().day.at("18:00").do(WWOTDpost)
+
 
 while True:
     schedule.run_pending()
