@@ -116,7 +116,7 @@ def WWOTDpost(Welsh_word, English_word, Word_class, Pronunciation, IPA, Mutation
         .format(English_word, Word_class,
                 Pronunciation, ''.join(IPA), Mutation, Mutation_dict)
     title = 'WWOTD: {}'.format(Welsh_word.capitalize())
-    reddit.subreddit('testingground4bots').submit(title, selftext)
+    reddit.subreddit('learnwelsh').submit(title, selftext)
 
 
 def main():
