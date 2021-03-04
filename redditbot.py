@@ -5,6 +5,7 @@ import time
 import random
 from bs4 import BeautifulSoup as bs
 import requests
+import mutator as m
 
 
 def get_dict():
@@ -38,7 +39,7 @@ def popped_words(welsh_word, english_word, used=bool):
 
 
 def get_welsh_word(word_dict):
-    """finds welsh word in dict"""
+    """chooses random welsh word from dict"""
     Welsh_word = random.choice(list(word_dict.keys()))
     return Welsh_word
 
@@ -85,25 +86,22 @@ def get_IPA(soup):
                 sibling.find('ul').decompose()
                 for li in sibling.find_all('li'):
                     IPA.append(str(li.text.strip().replace('IPA(key)', '')))
+                IPA = '\n\n'.join(IPA).replace('(', '')
+                IPA = IPA.replace(')', '')
     return IPA
 
 
-def get_mutations(soup):
-    """ Finds the mutation table and creates a dictionary from it """
+def get_mutations(welsh_word):
+    """ Mutates the word according to the Welsh mutation rules and creates a table """
 
-    for tag in soup.find(id='Welsh').parent.find_next_siblings('h3'):
-        sibling = tag.find_next_sibling()
-        if sibling.name == 'table':
-            keys = [
-                th.text.strip() for th in
-                sibling.find_all('th')[-1].find_parent().find_all('th')
-            ]
-            values = [td.text.strip() for td in sibling.find_all('td')]
-            Mutation_dict = dict(zip(keys, values))
-            return Mutation_dict
+    mutations = f'''
+|soft|aspirate|nasal|h_pros|
+:--|:--|:--|:--|
+|{m.soft(welsh_word)}|{m.aspirate(welsh_word)}|{m.nasal(welsh_word)}|{m.h_proth(welsh_word)}|'''
+    return mutations
 
 
-def WWOTDpost(Welsh_word, English_word, Word_class, Pronunciation, IPA, Mutation, Mutation_dict):
+def WWOTDpost(welsh_word, english_word, word_class, pronunciation, mutation, mutation_table):
     """ Posts to reddit """
     reddit = praw.Reddit(client_id=os.getenv('client_id'),
                          client_secret=os.getenv('client_secret'),
@@ -112,29 +110,28 @@ def WWOTDpost(Welsh_word, English_word, Word_class, Pronunciation, IPA, Mutation
                          password=os.getenv('Reddit_password'))
 
     reddit.validate_on_submit = True
-    selftext = '{0}\n\n{1}\n\n{2}{3}\n\n{4}{5}' \
-        .format(English_word, Word_class,
-                Pronunciation, ''.join(IPA), Mutation, Mutation_dict)
-    title = 'WWOTD: {}'.format(Welsh_word.capitalize())
+    selftext = '{0}\n\n{1}\n\n{2}\n\n{3}\n\n{4}' \
+        .format(english_word, word_class,
+                pronunciation, mutation, mutation_table)
+    title = 'WWOTD: {}'.format(welsh_word.capitalize())
     reddit.subreddit('learnwelsh').submit(title, selftext)
 
 
 def main():
     word_dict = get_dict()
-    Welsh_word = get_welsh_word(word_dict)
-    English_word = word_dict[Welsh_word].capitalize()
-    soup = get_soup(Welsh_word)
-    Word_class = get_word_class(soup, Welsh_word)
-    IPA = get_IPA(soup)
-    Mutation = 'Mutations: '
-    Mutation_dict = get_mutations(soup)
-    if not IPA:
-        IPA = ''
-        Pronunciation = ''
+    welsh_word = get_welsh_word(word_dict)
+    english_word = word_dict[welsh_word].capitalize()
+    soup = get_soup(welsh_word)
+    pronunciation = get_IPA(soup)
+    if not pronunciation:
+        pronunciation = ''
     else:
-        Pronunciation = 'Pronunciation: '
-    popped_words(Welsh_word, English_word, used=True)
-    WWOTDpost(Welsh_word, English_word, Word_class, Pronunciation, IPA, Mutation, Mutation_dict)
+        pronunciation = f'**Pronunciation:**\n\n{pronunciation}'
+    mutation = '**Mutations:**\n\n'
+    mutation_table = get_mutations(welsh_word)
+    word_class = get_word_class(soup, welsh_word, english_word)
+    popped_words(welsh_word, english_word, used=True)
+    WWOTDpost(welsh_word, english_word, word_class, pronunciation, mutation, mutation_table)
 
 
 if __name__ == '__main__':
