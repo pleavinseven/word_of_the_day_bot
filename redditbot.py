@@ -129,7 +129,7 @@ def main():
         pronunciation = f'**Pronunciation:**\n\n{pronunciation}'
     mutation = '**Mutations:**\n\n'
     mutation_table = get_mutations(welsh_word)
-    word_class = get_word_class(soup, welsh_word, english_word)
+    word_class = get_word_class(soup, welsh_word)
     popped_words(welsh_word, english_word, used=True)
     WWOTDpost(welsh_word, english_word, word_class, pronunciation, mutation, mutation_table)
 
