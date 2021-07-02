@@ -1,59 +1,71 @@
-import praw
-import os
 import schedule
 import time
-import random
 from bs4 import BeautifulSoup as bs
 import requests
+import praw
 import mutator as m
+import mysql.connector
+import os
+
+Singular = ''
+SingularTranslation = ''
+Plural = ''
+PluralTranslation = ''
+Gender = ''
+mydb = mysql.connector.connect(
+    host=os.getenv('db_host'),
+    user=os.getenv('db_username'),
+    password=os.getenv('db_password'),
+    database=os.getenv('db_name')
+    )
 
 
-def get_dict():
-    """creates dictionary from word-list text document"""
-    with open('word_list.txt', 'r') as f:
-        f = f.readlines()
-        word_dict = {k: v for k, v in (line.split(':') for line in f)}
-    return word_dict
+def reset_database():
+    my_cursor = mydb.cursor(buffered=True)
+    reset_all = "update words set Used = false where Used = true"
+    my_cursor.execute(reset_all)
+    mydb.commit()
+    main()
 
 
-def popped_words(welsh_word, english_word, used=bool):
-    """
-     if word is not in wiktionary(used= False),
-     word is written to non_words.txt,
-     else word is written to use_words.txt.
-     Word is then removed from word list
-    """
-    if used:
-        with open('used_words.txt', 'a') as f:
-            f.write('{}:{}'.format(welsh_word.lower(), english_word.lower()))
-        with open("word_list.txt", "r") as f:
-            lines = f.readlines()
-        with open("word_list.txt", "w") as f:
-            for line in lines:
-                if line.strip("\n") != '{}:{}'.format(welsh_word.lower(), english_word.lower()):
-                    f.write(line)
+def DB_query():
+    global Singular
+    global SingularTranslation
+    global Plural
+    global PluralTranslation
+    global Gender
+    my_cursor = mydb.cursor(buffered=True)
+    sql = "SELECT * FROM words WHERE USED is False"
+    my_cursor.execute(sql)
+    mydb.commit()
+    my_result = my_cursor.fetchall()
+    if not my_result:
+        reset_database()
     else:
-        with open('non_words.txt', 'a') as f:
-            f.write('{}:{}'.format(welsh_word.lower(), english_word.lower()))
-        main()
+        row = my_result[0]
+        Singular = row[0].capitalize()
+        SingularTranslation = f'_{row[1].capitalize()}_'
+        if row[2] != 'None':
+            Plural = f'**{row[2].capitalize()}:**\n\n_{row[3].capitalize()}_'
+        else:
+            Plural = ''
+            PluralTranslation = ''
+        if row[4] != 'None':
+            Gender = f'**Gender:** {row[4].capitalize()}'
+        else:
+            Gender = ''
 
 
-def get_welsh_word(word_dict):
-    """chooses random welsh word from dict"""
-    Welsh_word = random.choice(list(word_dict.keys()))
-    return Welsh_word
-
-
-def get_soup(Welsh_word):
-    """ gets page content, referenced as soup """
-    page = requests.get('https://en.wiktionary.org/wiki/{}'.format(Welsh_word))
+def get_soup(singular):
+    ''' gets page content, referenced as soup '''
+    page = requests.get('https://en.wiktionary.org/wiki/{}'.format(singular))
     src = page.content
     soup = bs(src, 'lxml')
     return soup
 
 
-def get_word_class(soup, welsh_word):
-    """ checks for h3 section with a name equal to a word class """
+def get_word_class(soup):
+    ''' checks for h3 section with a name equal to a word class '''
     try:
         for tag in soup.find(id='Welsh').parent.find_next_siblings('h3'):
             section = next(tag.strings)
@@ -63,46 +75,59 @@ def get_word_class(soup, welsh_word):
                 'Preposition', 'Conjunction',
                 'Determiner', 'Exclamation'
             ]:
-                Word_class = section
-                return Word_class
+                word_class = f'**Word class:** {section}'
             else:
-                continue
+                word_class = ''
     except AttributeError:
-        popped_words(welsh_word, used=False)
+        word_class = ''
+    finally:
+        return word_class
 
 
 def get_IPA(soup):
-    """
+    '''
     finds the IPA in the Pronunciation section and creates a variable from it,
     if IPA is non existent then both the IPA Var and Pronunciation Var are made into empty strings
-    """
+    '''
     IPA = []
-    for tag in soup.find(id='Welsh').parent.find_next_siblings('h3'):
-        sibling = tag.find_next_sibling()
-        if sibling.name == 'ul':
-            if sibling.find('ul'):
-                for li in sibling.find('ul').find_all('li'):
-                    sibling.append(li)
-                sibling.find('ul').decompose()
-                for li in sibling.find_all('li'):
-                    IPA.append(str(li.text.strip().replace('IPA(key)', '')))
-                IPA = '\n\n'.join(IPA).replace('(', '')
-                IPA = IPA.replace(')', '')
-    return IPA
+    try:
+        for tag in soup.find(id='Welsh').parent.find_next_siblings('h3'):
+            sibling = tag.find_next_sibling()
+            if sibling.name == 'ul':
+                if sibling.find('ul'):
+                    for li in sibling.find('ul').find_all('li'):
+                        sibling.append(li)
+                    sibling.find('ul').decompose()
+                    for li in sibling.find_all('li'):
+                        IPA.append(str(li.text.strip().replace('IPA(key)', '')))
+                    IPA = '\n\n'.join(IPA).replace('(', '')
+                    IPA = IPA.replace(')', '')
+                    pronunciation = f'**Pronunciation:**\n\n{IPA}'
+                    return pronunciation
+    except AttributeError:
+        pronunciation = ''
+        return pronunciation
 
 
-def get_mutations(welsh_word):
-    """ Mutates the word according to the Welsh mutation rules and creates a table """
+def get_mutations(singular):
+    ''' Mutates the word according to the Welsh mutation rules and creates a table '''
 
     mutations = f'''
+**Mutations:**\n\n
 |soft|aspirate|nasal|h_pros|
 :--|:--|:--|:--|
-|{m.soft(welsh_word)}|{m.aspirate(welsh_word)}|{m.nasal(welsh_word)}|{m.h_proth(welsh_word)}|'''
+|{m.soft(singular)}|{m.aspirate(singular)}|{m.nasal(singular)}|{m.h_proth(singular)}|'''
     return mutations
 
 
-def WWOTDpost(welsh_word, english_word, word_class, pronunciation, mutation, mutation_table):
-    """ Posts to reddit """
+def WWOTDpost(word_class, pronunciation, mutation_table):
+    ''' Posts to reddit '''
+    global Singular
+    global SingularTranslation
+    global Plural
+    global PluralTranslation
+    global Gender
+
     reddit = praw.Reddit(client_id=os.getenv('client_id'),
                          client_secret=os.getenv('client_secret'),
                          user_agent='WWOTDbot',
@@ -110,32 +135,39 @@ def WWOTDpost(welsh_word, english_word, word_class, pronunciation, mutation, mut
                          password=os.getenv('Reddit_password'))
 
     reddit.validate_on_submit = True
-    selftext = '{0}\n\n{1}\n\n{2}\n\n{3}\n\n{4}' \
-        .format(english_word, word_class,
-                pronunciation, mutation, mutation_table)
-    title = 'WWOTD: {}'.format(welsh_word.capitalize())
-    reddit.subreddit('learnwelsh').submit(title, selftext)
+    selftext = f'{SingularTranslation}\n\n{Plural}\n\n{Gender}\n\n{word_class}\n\n{pronunciation}\n\n{mutation_table}'
+    title = 'WWOTD: {}'.format(Singular.capitalize())
+    reddit.subreddit('testingground4bots').submit(title, selftext)
+
+
+def used_word():
+    global Singular
+    cursor = mydb.cursor(buffered=True)
+    reset = f"UPDATE words\
+            SET Used = True\
+            WHERE Singular = '{Singular}';"
+    cursor.execute(reset)
+    mydb.commit()
 
 
 def main():
-    word_dict = get_dict()
-    welsh_word = get_welsh_word(word_dict)
-    english_word = word_dict[welsh_word].capitalize()
-    soup = get_soup(welsh_word)
+    global Singular
+    global SingularTranslation
+    global Plural
+    global PluralTranslation
+    global Gender
+    DB_query()
+    soup = get_soup(Singular)
     pronunciation = get_IPA(soup)
-    if not pronunciation:
-        pronunciation = ''
-    else:
-        pronunciation = f'**Pronunciation:**\n\n{pronunciation}'
-    mutation = '**Mutations:**\n\n'
-    mutation_table = get_mutations(welsh_word)
-    word_class = get_word_class(soup, welsh_word)
-    popped_words(welsh_word, english_word, used=True)
-    WWOTDpost(welsh_word, english_word, word_class, pronunciation, mutation, mutation_table)
+    mutation_table = get_mutations(Singular)
+    word_class = get_word_class(soup)
+    WWOTDpost(word_class, pronunciation, mutation_table)
+    used_word()
 
 
 if __name__ == '__main__':
     main()
+
 
 schedule.every().day.at("10:30").do(WWOTDpost)
 
