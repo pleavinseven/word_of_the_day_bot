@@ -43,15 +43,15 @@ def DB_query():
         reset_database()
     else:
         row = my_result[0]
-        Singular = row[0].capitalize()
-        SingularTranslation = f'_{row[1].capitalize()}_'
-        if row[2] != 'None':
-            Plural = f'**{row[2].capitalize()}:**\n\n_{row[3].capitalize()}_'
+        Singular = row[1].capitalize()
+        SingularTranslation = f'_{row[2].capitalize()}_'
+        if row[3] != 'None':
+            Plural = f'**{row[3].capitalize()}:**\n\n_{row[4].capitalize()}_'
         else:
             Plural = ''
             PluralTranslation = ''
-        if row[4] != 'None':
-            Gender = f'**Gender:** {row[4].capitalize()}'
+        if row[5] != 'None':
+            Gender = f'**Gender:** {row[5].capitalize()}'
         else:
             Gender = ''
 
@@ -137,7 +137,7 @@ def WWOTDpost(word_class, pronunciation, mutation_table):
     reddit.validate_on_submit = True
     selftext = f'{SingularTranslation}\n\n{Plural}\n\n{Gender}\n\n{word_class}\n\n{pronunciation}\n\n{mutation_table}'
     title = 'WWOTD: {}'.format(Singular.capitalize())
-    reddit.subreddit('testingground4bots').submit(title, selftext)
+    reddit.subreddit('learnwelsh').submit(title, selftext)
 
 
 def used_word():
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     main()
 
 
-schedule.every().day.at("10:30").do(WWOTDpost)
+schedule.every().day.at("10:30").do(main)
 
 while True:
     schedule.run_pending()
