@@ -165,10 +165,6 @@ def main():
     used_word()
 
 
-if __name__ == '__main__':
-    main()
-
-
 schedule.every().day.at("10:30").do(main)
 
 while True:
