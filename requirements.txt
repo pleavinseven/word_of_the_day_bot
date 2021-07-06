@@ -1,4 +1,4 @@
-mysql
+mysql-connector-python
 schedule
 PyDictionary~=	2.0.1
 beautifulsoup4~=	4.9.3
