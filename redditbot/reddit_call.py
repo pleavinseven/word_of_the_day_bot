@@ -99,4 +99,4 @@ def WWOTDpost(word_class, pronunciation, mutation_table, Singular, SingularTrans
 
 
 if __name__ == '__main__':
-    print('dunno')
+    pass
