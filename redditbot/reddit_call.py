@@ -1,59 +1,29 @@
-import schedule
-import time
 from bs4 import BeautifulSoup as bs
 import requests
 import praw
-import mutator as m
-import mysql.connector
+from redditbot import mutator as m
 import os
 
-Singular = ''
-SingularTranslation = ''
-Plural = ''
-PluralTranslation = ''
-Gender = ''
-mydb = mysql.connector.connect(
-    host=os.getenv('db_host'),
-    user=os.getenv('db_username'),
-    password=os.getenv('db_password'),
-    database=os.getenv('db_name')
-    )
+reddit = praw.Reddit(client_id=os.getenv('client_id'),
+                     client_secret=os.getenv('client_secret'),
+                     user_agent='WWOTDbot',
+                     username='WWOTDbot',
+                     password=os.getenv('Reddit_password'))
 
 
-def reset_database():
-    my_cursor = mydb.cursor(buffered=True)
-    reset_all = "update words set Used = false where Used = true"
-    my_cursor.execute(reset_all)
-    mydb.commit()
-    main()
-
-
-def DB_query():
-    global Singular
-    global SingularTranslation
-    global Plural
-    global PluralTranslation
-    global Gender
-    my_cursor = mydb.cursor(buffered=True)
-    sql = "SELECT * FROM words WHERE USED is False"
-    my_cursor.execute(sql)
-    mydb.commit()
-    my_result = my_cursor.fetchall()
-    if not my_result:
-        reset_database()
+def get_words(my_result):
+    row = my_result[0]
+    Singular = row[1].capitalize()
+    SingularTranslation = f'_{row[2].capitalize()}_'
+    if row[3] != 'None':
+        Plural = f'**{row[3].capitalize()}:**\n\n_{row[4].capitalize()}_'
     else:
-        row = my_result[0]
-        Singular = row[1].capitalize()
-        SingularTranslation = f'_{row[2].capitalize()}_'
-        if row[3] != 'None':
-            Plural = f'**{row[3].capitalize()}:**\n\n_{row[4].capitalize()}_'
-        else:
-            Plural = ''
-            PluralTranslation = ''
-        if row[5] != 'None':
-            Gender = f'**Gender:** {row[5].capitalize()}'
-        else:
-            Gender = ''
+        Plural = ''
+    if row[5] != 'None':
+        Gender = f'**Gender:** {row[5].capitalize()}'
+    else:
+        Gender = ''
+    return Singular, SingularTranslation, Plural, Gender
 
 
 def get_soup(singular):
@@ -120,54 +90,13 @@ def get_mutations(singular):
     return mutations
 
 
-def WWOTDpost(word_class, pronunciation, mutation_table):
+def WWOTDpost(word_class, pronunciation, mutation_table, Singular, SingularTranslation, Plural, Gender):
     ''' Posts to reddit '''
-    global Singular
-    global SingularTranslation
-    global Plural
-    global PluralTranslation
-    global Gender
-
-    reddit = praw.Reddit(client_id=os.getenv('client_id'),
-                         client_secret=os.getenv('client_secret'),
-                         user_agent='WWOTDbot',
-                         username='WWOTDbot',
-                         password=os.getenv('Reddit_password'))
-
     reddit.validate_on_submit = True
     selftext = f'{SingularTranslation}\n\n{Plural}\n\n{Gender}\n\n{word_class}\n\n{pronunciation}\n\n{mutation_table}'
     title = 'WWOTD: {}'.format(Singular.capitalize())
     reddit.subreddit('learnwelsh').submit(title, selftext)
 
 
-def used_word():
-    global Singular
-    cursor = mydb.cursor(buffered=True)
-    reset = f"UPDATE words\
-            SET Used = True\
-            WHERE Singular = '{Singular}';"
-    cursor.execute(reset)
-    mydb.commit()
-
-
-def main():
-    global Singular
-    global SingularTranslation
-    global Plural
-    global PluralTranslation
-    global Gender
-    DB_query()
-    soup = get_soup(Singular)
-    pronunciation = get_IPA(soup)
-    mutation_table = get_mutations(Singular)
-    word_class = get_word_class(soup)
-    WWOTDpost(word_class, pronunciation, mutation_table)
-    used_word()
-
-
 if __name__ == '__main__':
-    schedule.every().day.at("10:30").do(main)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    pass
