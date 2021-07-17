@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='WWOTDbot',
-    version='2.0',
+    version='1.1.0',
     description='redditbot posting a word of the day with translation',
     author='Joe Pleavin',
     author_email='pleavinseven@gmail.com',
@@ -30,7 +30,7 @@ setup(
                   "prawcore~=	1.5.0",
                   "requests~=	2.25.0",
                   "rfc3986~=	1.4.0",
-                  "schedule",
+                  "schedule~=	1.1.0",
                   "setuptools~=	40.8.0",
                   "six~=	1.15.0",
                   "sniffio~=	1.2.0",
