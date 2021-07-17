@@ -1,0 +1,27 @@
+{
+  "Reddit":
+  {
+    "client_id": "client_id",
+    "client_secret": "client_secret",
+    "user_agent": "WWOTDbot",
+    "username": "WWOTDbot",
+    "password": "Reddit_password",
+
+    "language_ID": "Welsh",
+
+    "page": "https://en.wiktionary.org/wiki/",
+    "subreddit": "learnwelsh"
+
+  },
+  "Database":
+  {
+    "host": "db_host",
+    "user": "db_username",
+    "password": "db_password",
+    "database": "db_name"
+  },
+  "Main":
+  {
+    "Schedule": "10:30"
+  }
+}
