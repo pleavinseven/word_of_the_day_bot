@@ -1,7 +1,9 @@
 import schedule
 import time
-from redditbot.reddit_call import get_soup, get_IPA, get_mutations, get_word_class, WWOTDpost, get_words
+from redditbot.reddit_call import *
 from redditbot.database_call import DB_query, used_word, reset_database
+from config import config as cfg
+cfg_dict = cfg.config_dict
 
 
 def redditbot_run():
@@ -9,7 +11,9 @@ def redditbot_run():
     if not result:
         reset_database()
         redditbot_run()
-    Singular, SingularTranslation, Plural, Gender = get_words(result)
+    Singular, SingularTranslation = get_word(result)
+    Plural = get_plural(result)
+    Gender = get_gender(result)
     soup = get_soup(Singular)
     pronunciation = get_IPA(soup)
     mutation_table = get_mutations(Singular)
@@ -19,7 +23,7 @@ def redditbot_run():
 
 
 if __name__ == '__main__':
-    schedule.every().day.at("10:30").do(redditbot_run)
+    schedule.every().day.at(f"{cfg_dict['Main']['Schedule']}").do(redditbot_run)
 
     while True:
         schedule.run_pending()
