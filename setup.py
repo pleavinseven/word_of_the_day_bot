@@ -24,7 +24,7 @@ setup(
                   "httpx~=	0.13.3",
                   "hyperframe~=	5.2.0",
                   "idna~=	2.10",
-                  "mysql",
+                  "mysql-connector-python~= 8.0.25",
                   "pip~=	19.0.3",
                   "praw~=	7.1.0",
                   "prawcore~=	1.5.0",
