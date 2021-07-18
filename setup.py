@@ -8,7 +8,7 @@ setup(
     author_email='pleavinseven@gmail.com',
     license='MIT',
     url='https://github.com/pleavinseven/WWOTD',
-    requirements=[
+    install_requires=[
                   "beautifulsoup4~=	4.9.3",
                   "bs4~=	0.0.1",
                   "certifi~=	2020.12.5",
@@ -39,5 +39,5 @@ setup(
                   "urllib3~=	1.26.2",
                   "websocket-client~=	0.57.0"
                   ],
-    packages=find_packages(),
+    packages=find_packages()
 )
