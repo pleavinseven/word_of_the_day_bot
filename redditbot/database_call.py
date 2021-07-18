@@ -4,10 +4,10 @@ from config import config as cfg
 cfg_dict = cfg.config_dict
 
 mydb = mysql.connector.connect(
-    host=os.getenv(f'{cfg_dict["Database"]["db_host"]}'),
-    user=os.getenv(f'{cfg_dict["Database"]["db_username"]}'),
-    password=os.getenv(f'{cfg_dict["Database"]["db_password"]}'),
-    database=os.getenv(f'{cfg_dict["Database"]["db_name"]}'))
+    host=os.getenv(f'{cfg_dict["Database"]["host"]}'),
+    user=os.getenv(f'{cfg_dict["Database"]["user"]}'),
+    password=os.getenv(f'{cfg_dict["Database"]["password"]}'),
+    database=os.getenv(f'{cfg_dict["Database"]["database"]}'))
 
 
 def reset_database():
