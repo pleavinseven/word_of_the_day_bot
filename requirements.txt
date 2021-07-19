@@ -27,3 +27,4 @@ soupsieve~=	2.1
 update-checker~=	0.18.0
 urllib3~=	1.26.2
 websocket-client~=	0.57.0
+-e .
