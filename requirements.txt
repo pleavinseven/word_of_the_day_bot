@@ -13,6 +13,7 @@ httpcore~=	0.9.1
 httpx~=	0.13.3
 hyperframe~=	5.2.0
 idna~=	2.10
+lxml~= 4.6.3
 mysql-connector-python~= 8.0.25
 pip~=	19.0.3
 praw~=	7.1.0
