@@ -39,8 +39,9 @@ def aspirate(word):
 def h_proth(word):
     mutable_letters = {"A", "E", "I", "O", "W", "Y"}
     do_not_mutate_list = {"A", "Ar", "I", "O", "W", "Y", "Yn"}
-    if word not in do_not_mutate_list:
-        if word[0] in mutable_letters:
-            mutated_word = "H" + word
-            return mutated_word
+    if len(word.split()) == 1:
+        if word not in do_not_mutate_list:
+            if word[0] in mutable_letters:
+                mutated_word = "H" + word
+                return mutated_word
     return word
