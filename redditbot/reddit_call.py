@@ -112,7 +112,7 @@ def WWOTDpost(word_class, pronunciation, mutation_table, singular, singular_tran
     reddit.validate_on_submit = True
     selftext = f'{singular_translation}\n\n{plural}\n\n{gender}\n\n{word_class}\n\n{pronunciation}\n\n{mutation_table}'
     title = f'WWOTD: {singular.capitalize()}'
-    reddit.subreddit(f'{cfg_dict["Reddit"]["subreddit"]}').submit(title, selftext)
+    reddit.subreddit(f'{cfg_dict["Reddit"]["subreddit"]}').submit(title, selftext, flair_id='a6c72efe-162e-11ec-adc4-b26f4ab04a7a')
 
 
 if __name__ == '__main__':
