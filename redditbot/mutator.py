@@ -42,6 +42,6 @@ def h_proth(word):
     if len(word.split()) == 1:
         if word not in do_not_mutate_list:
             if word[0] in mutable_letters:
-                mutated_word = "H" + word
+                mutated_word = "H" + word.lower
                 return mutated_word
     return word
