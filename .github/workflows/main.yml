@@ -1,0 +1,50 @@
+name: wwotdbot run
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Runs every 2 hours
+    - cron: "0 10/24 * * *"
+
+jobs:
+  prep:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8.2
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8.2
+    - name: Install pipenv
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv
+    - name: Install dependencies
+      run: |
+        pipenv install
+    - name: Create ENV file
+      shell: bash
+      env:
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        JAWSDB_URL: ${{ secrets.JAWSDB_URL }}
+        REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+      run: |
+        touch .env
+        echo CLIENT_ID=$CLIENT_ID >> .env
+        echo CLIENT_SECRET=$CLIENT_SECRET >> .env
+        echo DB_HOST=$DB_HOST >> .env
+        echo DB_NAME=$DB_NAME >> .env
+        echo DB_PASSWORD=$DB_PASSWORD >> .env
+        echo DB_USERNAME=$DB_USERNAME >> .env
+        echo JAWSDB_URL=$JAWSDB_URL >> .env
+        echo REDDIT_PASSWORD=$REDDIT_PASSWORD >> .env
+        cat .env
+    - name: wwotdbot run
+      shell: bash
+      run: |
+        pipenv run python main.py
