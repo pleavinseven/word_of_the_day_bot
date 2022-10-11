@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='WWOTDbot',
-    version='1.1.0',
+    version='1.2.0',
     description='redditbot posting a word of the day with translation',
     author='Joe Pleavin',
     author_email='pleavinseven@gmail.com',
