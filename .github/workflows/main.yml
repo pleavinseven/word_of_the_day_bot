@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # Runs every 2 hours
-    - cron: "0 10/24 * * *"
+    - cron: "0 21/24 * * *"
 
 jobs:
   prep:
