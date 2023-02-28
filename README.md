@@ -1,5 +1,5 @@
 # WWOTD
-Reddit bot posting a **Welsh Word of the Day** with English translation, a short description and word class/lexical category, daily at 10.30am UTC to [r/learnwelsh.](https://www.reddit.com/r/learnwelsh/) 
+Reddit bot posting a **Welsh Word of the Day** with English translation, a short description and word class/lexical category, daily to [r/learnwelsh.](https://www.reddit.com/r/learnwelsh/) 
 
 The idea of this bot is to help people learn the Welsh language one word at a time.
 
